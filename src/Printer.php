@@ -1,9 +1,13 @@
 <?php
 
+use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt;
 
 class Printer extends PhpParser\PrettyPrinter\Standard
 {
+
+	protected $keepLines = FALSE;
 
 	public function prepare(array $stmts)
 	{
@@ -64,7 +68,57 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	 * add empty line after method declaration
 	 */
 	public function pStmt_ClassMethod(Stmt\ClassMethod $node) {
-		return parent::pStmt_ClassMethod($node) . "\n";
+		return $this->pModifiers($node->type)
+		. 'function ' . ($node->byRef ? '&' : '') . $node->name
+		. '(' . $this->pCommaSeparated($node->params) . ')'
+		. (null !== $node->returnType ? ' : ' . $this->pType($node->returnType) : '')
+		. (null !== $node->stmts
+			? "\n" . '{' . $this->pMethodStmts($node->stmts) . "\n" . '}'
+			: ';')
+		. "\n";
 	}
+
+	public function pMethodStmts(array $nodes)
+	{
+		$this->keepLines = TRUE;
+		$res = $this->pStmts($nodes);
+		$this->keepLines = FALSE;
+		return $res;
+	}
+
+	/**
+	 * adds up to two empty lines based on the original code if $this->keepLines
+	 *
+	 * @param Node[] $nodes  Array of nodes
+	 * @param bool   $indent Whether to indent the printed nodes
+	 *
+	 * @return string Pretty printed statements
+	 */
+	protected function pStmts(array $nodes, $indent = true) {
+		$result = '';
+		$lastLine = NULL;
+		foreach ($nodes as $node) {
+			$result .= "\n";
+			if ($this->keepLines) {
+				if ($lastLine !== NULL) {
+					$result .= str_repeat("\n", min(2, $node->getLine() - $lastLine - 1));
+				}
+			}
+			$result .=
+				$this->pComments($node->getAttribute('comments', []))
+				. $this->p($node)
+				. ($node instanceof Expr ? ';' : '');
+
+			$lastLine = $node->getAttributes()['endLine'];
+		}
+
+		if ($indent) {
+			return preg_replace('~\n(?!$|' . $this->noIndentToken . ')~', "\n    ", $result);
+		} else {
+			return $result;
+		}
+	}
+
+
 
 }
