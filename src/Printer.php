@@ -88,6 +88,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 
 	/**
 	 * adds up to two empty lines based on the original code if $this->keepLines
+	 * indent with tabs
 	 *
 	 * @param Node[] $nodes  Array of nodes
 	 * @param bool   $indent Whether to indent the printed nodes
@@ -113,7 +114,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		}
 
 		if ($indent) {
-			return preg_replace('~\n(?!$|' . $this->noIndentToken . ')~', "\n    ", $result);
+			return preg_replace('~\n(?!$|' . $this->noIndentToken . ')~', "\n\t", $result);
 		} else {
 			return $result;
 		}
