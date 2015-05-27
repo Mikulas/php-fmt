@@ -119,6 +119,65 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		}
 	}
 
+	// CONTROL BLOCKS OPENING BRACKET ON EMPTY LINE
 
+	public function pStmt_If(Stmt\If_ $node) {
+		return 'if (' . $this->p($node->cond) . ")\n{"
+		. $this->pStmts($node->stmts) . "\n" . '}'
+		. $this->pImplode($node->elseifs)
+		. (null !== $node->else ? $this->p($node->else) : '');
+	}
+
+	public function pStmt_ElseIf(Stmt\ElseIf_ $node) {
+		return ' elseif (' . $this->p($node->cond) . ")\n{"
+		. $this->pStmts($node->stmts) . "\n" . '}';
+	}
+
+	public function pStmt_Else(Stmt\Else_ $node) {
+		return " else\n{" . $this->pStmts($node->stmts) . "\n" . '}';
+	}
+
+	public function pStmt_For(Stmt\For_ $node) {
+		return 'for ('
+		. $this->pCommaSeparated($node->init) . ';' . (!empty($node->cond) ? ' ' : '')
+		. $this->pCommaSeparated($node->cond) . ';' . (!empty($node->loop) ? ' ' : '')
+		. $this->pCommaSeparated($node->loop)
+		. ")\n{" . $this->pStmts($node->stmts) . "\n" . '}';
+	}
+
+	public function pStmt_Foreach(Stmt\Foreach_ $node) {
+		return 'foreach (' . $this->p($node->expr) . ' as '
+		. (null !== $node->keyVar ? $this->p($node->keyVar) . ' => ' : '')
+		. ($node->byRef ? '&' : '') . $this->p($node->valueVar) . ")\n{"
+		. $this->pStmts($node->stmts) . "\n" . '}';
+	}
+
+	public function pStmt_While(Stmt\While_ $node) {
+		return 'while (' . $this->p($node->cond) . ")\n{"
+		. $this->pStmts($node->stmts) . "\n" . '}';
+	}
+
+	public function pStmt_Do(Stmt\Do_ $node) {
+		return "do\n{" . $this->pStmts($node->stmts) . "\n"
+		. "}\nwhile (" . $this->p($node->cond) . ');';
+	}
+
+	public function pStmt_Switch(Stmt\Switch_ $node) {
+		return 'switch (' . $this->p($node->cond) . ")\n{"
+		. $this->pStmts($node->cases) . "\n" . '}';
+	}
+
+	public function pStmt_TryCatch(Stmt\TryCatch $node) {
+		return "try\n{" . $this->pStmts($node->stmts) . "\n" . '}'
+		. $this->pImplode($node->catches)
+		. ($node->finallyStmts !== null
+			? " finally\n{" . $this->pStmts($node->finallyStmts) . "\n" . '}'
+			: '');
+	}
+
+	public function pStmt_Catch(Stmt\Catch_ $node) {
+		return ' catch (' . $this->p($node->type) . ' $' . $node->var . ")\n{"
+		. $this->pStmts($node->stmts) . "\n" . '}';
+	}
 
 }
