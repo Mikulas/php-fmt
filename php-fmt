@@ -1,0 +1,13 @@
+#!/bin/bash
+
+TMP="./.tmp"
+
+for F in ../khanovaskola/{app,bin}/**/*.php; do
+	echo "$F"
+	php src/run.php "$F" > "$TMP"
+	mv "$TMP" "$F"
+done
+
+if [ -e "$TMP" ]; then
+	rm "$TMP"
+fi
