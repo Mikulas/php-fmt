@@ -40,6 +40,10 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		return parent::prettyPrint($stmts);
 	}
 
+	/**
+	 * add 2 empty lines before class,
+	 * add empty line after class header,
+	 */
 	protected function pClassCommon(Stmt\Class_ $node, $afterClassToken) {
         return "\n\n"
 	        . $this->pModifiers($node->type)
@@ -49,8 +53,18 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	        . "\n" . '{' . "\n" . $this->pStmts($node->stmts) . "\n" . '}';
     }
 
+	/**
+	 * add empty line after property declaration
+	 */
     public function pStmt_Property(Stmt\Property $node) {
         return parent::pStmt_Property($node) . "\n";
     }
+
+	/**
+	 * add empty line after method declaration
+	 */
+	public function pStmt_ClassMethod(Stmt\ClassMethod $node) {
+		return parent::pStmt_ClassMethod($node) . "\n";
+	}
 
 }
