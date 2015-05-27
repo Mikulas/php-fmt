@@ -1,0 +1,12 @@
+{
+    "name": "mikulas/php-fmt",
+    "authors": [
+        {
+            "name": "Mikulas",
+            "email": "rullaf@gmail.com"
+        }
+    ],
+    "require": {
+        "nikic/PHP-Parser": "^1.3"
+    }
+}
