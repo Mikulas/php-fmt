@@ -44,6 +44,18 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		return parent::prettyPrint($stmts);
 	}
 
+	/** @internal */
+	public function pModifiers($modifiers) {
+		return
+		  ($modifiers & Stmt\Class_::MODIFIER_FINAL     ? 'final '     : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_PUBLIC    ? 'public '    : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_PROTECTED ? 'protected ' : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_PRIVATE   ? 'private '   : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_STATIC    ? 'static '    : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_ABSTRACT  ? 'abstract '  : '');
+	}
+
+
 	/**
 	 * add 2 empty lines before class,
 	 * add empty line after class header,
@@ -114,10 +126,44 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		}
 
 		if ($indent) {
-			return preg_replace('~\n(?!$|' . $this->noIndentToken . ')~', "\n\t", $result);
+			$lines = preg_replace('~\n(?!$|' . $this->noIndentToken . ')~', "\n\t", $result);
+			return preg_replace('~[ \t]+$~m', '', $lines); // trim trialing whitespace
 		} else {
 			return $result;
 		}
+	}
+
+	public function pExpr_Array(Expr\Array_ $node) {
+		return '[' . $this->pCommaSeparated($node->items) . ']';
+	}
+
+	/**
+	 * "{$view[0][2]}"
+	 * "{$view[$foo][2]}"
+	 * "$view[$foo]"
+	 * "$view[0]"
+	 *
+	 * @param array $encapsList
+	 * @param $quote
+	 * @return string
+	 */
+	public function pEncapsList(array $encapsList, $quote) {
+		$return = '';
+		foreach ($encapsList as $element) {
+			if (is_string($element)) {
+				$return .= addcslashes($element, "\n\r\t\f\v$" . $quote . "\\");
+			} else {
+				if ($element instanceof Expr\Variable) {
+					$return .= $this->p($element);
+				} else if ($element instanceof Expr\ArrayDimFetch && !($element->var instanceof Expr\ArrayDimFetch)) {
+					$return .= $this->p($element);
+				} else {
+					$return .= '{' . $this->p($element) . '}';
+				}
+			}
+		}
+
+		return $return;
 	}
 
 	// CONTROL BLOCKS OPENING BRACKET ON EMPTY LINE
@@ -130,12 +176,12 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	}
 
 	public function pStmt_ElseIf(Stmt\ElseIf_ $node) {
-		return ' elseif (' . $this->p($node->cond) . ")\n{"
+		return "\nelse if (" . $this->p($node->cond) . ")\n{"
 		. $this->pStmts($node->stmts) . "\n" . '}';
 	}
 
 	public function pStmt_Else(Stmt\Else_ $node) {
-		return " else\n{" . $this->pStmts($node->stmts) . "\n" . '}';
+		return "\nelse\n{" . $this->pStmts($node->stmts) . "\n" . '}';
 	}
 
 	public function pStmt_For(Stmt\For_ $node) {
