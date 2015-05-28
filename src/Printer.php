@@ -41,7 +41,12 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	public function prettyPrint(array $stmts)
 	{
 		$stmts = $this->prepare($stmts);
-		return parent::prettyPrint($stmts);
+		return parent::prettyPrint($stmts) . "\n";
+	}
+
+	public function prettyPrintFile(array $stmts)
+	{
+		return parent::prettyPrintFile($stmts) . "\n";
 	}
 
 	/** @internal */
@@ -134,7 +139,39 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	}
 
 	public function pExpr_Array(Expr\Array_ $node) {
-		return '[' . $this->pCommaSeparated($node->items) . ']';
+		$count = count($node->items);
+
+		if ($count === 0) {
+			return '[]';
+
+		} else if ($count <= 2) {
+			$x = array_filter($node->items, function($item) {
+				$i = $item->value;
+				return $i instanceof Expr\Variable || $i instanceof Node\Scalar;
+			});
+			if (count($x) === $count) {
+				return '[' . $this->pCommaSeparated($node->items) . ']';
+			}
+		}
+
+		$out = "[\n";
+		foreach ($node->items as $item)
+		{
+			$out .= "\t" . $this->p($item) . ",\n";
+		}
+		$out .= "]";
+		return $out;
+	}
+
+	/**
+	 * Pretty prints an array of nodes and implodes the printed values with commas.
+	 *
+	 * @param Node[] $nodes Array of Nodes to be printed
+	 *
+	 * @return string Comma separated pretty printed nodes
+	 */
+	protected function pCommaSeparated(array $nodes) {
+		return $this->pImplode($nodes, ", ");
 	}
 
 	/**
