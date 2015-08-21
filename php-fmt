@@ -1,15 +1,8 @@
 #!/bin/bash
 
-TMP="./.tmp"
-
-for F in ../khanovaskola/{app,bin}/**/*.php; do
+TMP=$(mktemp /tmp/php-fmt.XXXX)
+for F in $(find /tmp/export/app -name '*.php'); do
 	echo "$F"
-
 	php src/run.php "$F" > "$TMP"
-
 	mv "$TMP" "$F"
 done
-
-if [ -e "$TMP" ]; then
-	rm "$TMP"
-fi
