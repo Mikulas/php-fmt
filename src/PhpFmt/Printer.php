@@ -193,15 +193,11 @@ class Printer extends PrettyPrinter\Standard
 
 		if ($count === 0) {
 			return '[]';
+		}
 
-		} else if ($count <= 2) {
-			$x = array_filter($node->items, function($item) {
-				$i = $item->value;
-				return $i instanceof Expr\Variable || $i instanceof Node\Scalar;
-			});
-			if (count($x) === $count) {
-				return '[' . $this->pCommaSeparated($node->items) . ']';
-			}
+		$inline = $this->pCommaSeparated($node->items);
+		if (strlen($inline) <= 60) {
+			return "[$inline]";
 		}
 
 		$out = "[\n";
