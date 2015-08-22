@@ -4,6 +4,7 @@ namespace PhpFmt;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt;
 use PhpParser\PrettyPrinter;
 
@@ -85,10 +86,10 @@ class Printer extends PrettyPrinter\Standard
 	public function pModifiers($modifiers) {
 		return ($modifiers & Stmt\Class_::MODIFIER_FINAL ? 'final '     : '')
 		. ($modifiers & Stmt\Class_::MODIFIER_ABSTRACT   ? 'abstract '  : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_STATIC     ? 'static '    : '')
 		. ($modifiers & Stmt\Class_::MODIFIER_PUBLIC     ? 'public '    : '')
 		. ($modifiers & Stmt\Class_::MODIFIER_PROTECTED  ? 'protected ' : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_PRIVATE    ? 'private '   : '');
+		. ($modifiers & Stmt\Class_::MODIFIER_PRIVATE    ? 'private '   : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_STATIC     ? 'static '    : '');
 	}
 
 
@@ -137,6 +138,18 @@ class Printer extends PrettyPrinter\Standard
 		// set by KeepOriginalValueLexer
 		return (string) $node->getAttributes()['originalValue'];
 	}
+
+
+	public function pScalar_String(Scalar\String_ $node)
+	{
+		// set by KeepOriginalValueLexer
+		$attr = $node->getAttributes();
+		if (isset($attr['originalValue'])) {
+			return (string) $attr['originalValue'];
+		}
+		return parent::pScalar_String($node);
+	}
+
 
 	/**
 	 * adds up to two empty lines based on the original code if $this->keepLines
