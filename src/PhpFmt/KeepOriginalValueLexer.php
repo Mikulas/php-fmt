@@ -1,5 +1,7 @@
 <?php
 
+namespace PhpFmt;
+
 use PhpParser\Lexer;
 use PhpParser\Parser;
 

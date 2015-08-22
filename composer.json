@@ -3,9 +3,12 @@
     "authors": [
         {
             "name": "Mikulas",
-            "email": "rullaf@gmail.com"
+            "email": "mikulas.dite@gmail.com"
         }
     ],
+    "autoload": {
+        "classmap": ["src/"]
+    },
     "require": {
         "nikic/PHP-Parser": "^1.3"
     },

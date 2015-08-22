@@ -1,10 +1,13 @@
 <?php
 
+namespace PhpFmt;
+
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt;
+use PhpParser\PrettyPrinter;
 
-class Printer extends PhpParser\PrettyPrinter\Standard
+class Printer extends PrettyPrinter\Standard
 {
 
 	protected $keepLines = FALSE;
@@ -16,29 +19,52 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 
 	public function reorderRootUses(array $stmts)
 	{
-		/** @var Stmt\Namespace_ $ns */
-		foreach ($stmts as &$ns)
-		{
-			if (! $ns instanceof Stmt\Namespace_) {
+		$hasNs = FALSE;
+
+		foreach ($stmts as $stmt) {
+			if ($stmt instanceof Stmt\Namespace_) {
+				$hasNs = TRUE;
+			}
+		}
+
+		if (!$hasNs) {
+			return $this->sortStmts($stmts);
+		}
+
+		foreach ($stmts as $ns) {
+			if (!$ns instanceof Stmt\Namespace_) {
 				continue;
 			}
 
-			foreach ($ns->stmts as $node) {
-				if ($node instanceof Stmt\Use_ && count($node->uses) > 1) {
-					throw new Exception('use Foo, Bar; not allowed'); // TODO split this in prepare
-				}
-			}
-
-			usort($ns->stmts, function($a, $b) {
-				if ($a instanceof Stmt\Use_ && $b instanceof Stmt\Use_)
-				{
-					$an = implode('\\', $a->uses[0]->name->parts);
-					$bn = implode('\\', $b->uses[0]->name->parts);
-					return strcasecmp($an, $bn);
-				}
-				return 1; // TODO
-			});
+			$ns->stmts = $this->sortStmts($ns->stmts);
 		}
+		return $stmts;
+	}
+
+	private function sortStmts(array $stmts)
+	{
+		foreach ($stmts as $stmt) {
+			if ($stmt instanceof Stmt\Use_ && count($stmt->uses) > 1) {
+				throw new \Exception('combined use Foo, Bar; not allowed'); // TODO split this in prepare
+			}
+		}
+
+		usort($stmts, function($a, $b) {
+			if ($a instanceof Stmt\Use_ && ! $b instanceof Stmt\Use_) {
+				return -1;
+
+			} elseif (! $a instanceof Stmt\Use_ && $b instanceof Stmt\Use_) {
+				return 1;
+
+			} else {
+				// both Stm\Use_
+
+				$an = implode('\\', $a->uses[0]->name->parts);
+				$bn = implode('\\', $b->uses[0]->name->parts);
+				return strcasecmp($an, $bn);
+			}
+		});
+
 		return $stmts;
 	}
 

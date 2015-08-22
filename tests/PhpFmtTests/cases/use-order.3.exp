@@ -1,0 +1,12 @@
+<?php
+
+namespace Foo;
+
+use A;
+use M;
+use Z;
+namespace Bar;
+
+use B;
+use N;
+use U;
