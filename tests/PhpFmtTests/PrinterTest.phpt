@@ -9,6 +9,7 @@ namespace PhpFmtTests;
 
 use PhpFmt\KeepOriginalValueLexer;
 use PhpFmt\Printer;
+use PhpParser\Error;
 use PhpParser\Parser;
 use Tester\Assert;
 
@@ -41,10 +42,14 @@ class PrinterTest extends TestCase
 	 */
 	public function testCompare($exp, $in)
 	{
-		$stmts = $this->parser->parse(file_get_contents($in));
+		try {
+			$stmts = $this->parser->parse(file_get_contents($in));
+		} catch (Error $e) {
+			throw new FixtureException($in, $e);
+		}
 		$output = $this->printer->prettyPrintFile($stmts);
 
-		Assert::same(file_get_contents($exp), $output);
+		Assert::same(file_get_contents($exp), $output, $in);
 	}
 
 
