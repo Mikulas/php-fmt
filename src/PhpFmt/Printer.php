@@ -93,12 +93,10 @@ class Printer extends PrettyPrinter\Standard
 
 
 	/**
-	 * add 2 empty lines before class,
-	 * add empty line after class header,
+	 * add empty line after class block opening bracket
 	 */
 	protected function pClassCommon(Stmt\Class_ $node, $afterClassToken) {
-        return "\n\n"
-	        . $this->pModifiers($node->type)
+        return $this->pModifiers($node->type)
 	        . 'class' . $afterClassToken
 	        . (null !== $node->extends ? ' extends ' . $this->p($node->extends) : '')
 	        . (!empty($node->implements) ? ' implements ' . $this->pCommaSeparated($node->implements) : '')
@@ -165,9 +163,10 @@ class Printer extends PrettyPrinter\Standard
 			$prefix = $postfix = '';
 			if (!$isFirstNode && $node instanceof Stmt\ClassMethod) {
 				$prefix = "\n";
-			}
-			if ($previousNode instanceof Stmt\ClassConst && $node instanceof Stmt\Property) {
+			} elseif ($previousNode instanceof Stmt\ClassConst && $node instanceof Stmt\Property) {
 				$prefix = "\n";
+			} elseif ($node instanceof Stmt\Class_) {
+				$prefix = "\n\n";
 			}
 
 			$result .= $prefix
