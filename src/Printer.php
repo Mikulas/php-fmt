@@ -85,7 +85,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
     }
 
 	/**
-	 * add empty line after method declaration
+	 * add empty lines after method declaration
 	 */
 	public function pStmt_ClassMethod(Stmt\ClassMethod $node) {
 		return $this->pModifiers($node->type)
@@ -131,8 +131,14 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 					$result .= str_repeat("\n", min(2, $node->getLine() - $lastLine - 1));
 				}
 			}
-			$result .=
-				$this->pComments($node->getAttribute('comments', []))
+
+			$prefix = '';
+			if ($node instanceof Stmt\ClassMethod) {
+				$prefix = "\n";
+			}
+
+			$result .= $prefix
+				. $this->pComments($node->getAttribute('comments', []))
 				. $this->p($node)
 				. ($node instanceof Expr ? ';' : '');
 
