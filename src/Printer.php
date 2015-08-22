@@ -36,7 +36,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 					$bn = implode('\\', $b->uses[0]->name->parts);
 					return strcasecmp($an, $bn);
 				}
-				return 1;
+				return 1; // TODO
 			});
 		}
 		return $stmts;
@@ -124,6 +124,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	protected function pStmts(array $nodes, $indent = true) {
 		$result = '';
 		$lastLine = NULL;
+		$isFirstNode = TRUE;
 		foreach ($nodes as $node) {
 			$result .= "\n";
 			if ($this->keepLines) {
@@ -133,7 +134,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 			}
 
 			$prefix = '';
-			if ($node instanceof Stmt\ClassMethod) {
+			if (!$isFirstNode && $node instanceof Stmt\ClassMethod) {
 				$prefix = "\n";
 			}
 
@@ -143,6 +144,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 				. ($node instanceof Expr ? ';' : '');
 
 			$lastLine = $node->getAttributes()['endLine'];
+			$isFirstNode = FALSE;
 		}
 
 		if ($indent) {
