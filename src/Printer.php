@@ -34,7 +34,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 				{
 					$an = implode('\\', $a->uses[0]->name->parts);
 					$bn = implode('\\', $b->uses[0]->name->parts);
-					return strcmp($an, $bn);
+					return strcasecmp($an, $bn);
 				}
 				return 1;
 			});
@@ -108,6 +108,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 
 	public function pScalar_LNumber(Node\Scalar\LNumber $node)
 	{
+		// set by KeepOriginalValueLexer
 		return (string) $node->getAttributes()['originalValue'];
 	}
 
