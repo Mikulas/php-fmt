@@ -4,6 +4,7 @@ namespace PhpFmt;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\Cast;
 use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt;
 use PhpParser\PrettyPrinter;
@@ -148,6 +149,12 @@ class Printer extends PrettyPrinter\Standard
 			return (string) $attr['originalValue'];
 		}
 		return parent::pScalar_String($node);
+	}
+
+
+	public function pExpr_Cast_Double(Cast\Double $node)
+	{
+		return $this->pPrefixOp('Expr_Cast_Double', '(float) ', $node->expr);
 	}
 
 
