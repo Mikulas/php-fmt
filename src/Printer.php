@@ -19,6 +19,10 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		/** @var Stmt\Namespace_ $ns */
 		foreach ($stmts as &$ns)
 		{
+			if (! $ns instanceof Stmt\Namespace_) {
+				continue;
+			}
+
 			foreach ($ns->stmts as $node) {
 				if ($node instanceof Stmt\Use_ && count($node->uses) > 1) {
 					throw new Exception('use Foo, Bar; not allowed'); // TODO split this in prepare
@@ -51,13 +55,12 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 
 	/** @internal */
 	public function pModifiers($modifiers) {
-		return
-		  ($modifiers & Stmt\Class_::MODIFIER_FINAL     ? 'final '     : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_PUBLIC    ? 'public '    : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_PROTECTED ? 'protected ' : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_PRIVATE   ? 'private '   : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_STATIC    ? 'static '    : '')
-		. ($modifiers & Stmt\Class_::MODIFIER_ABSTRACT  ? 'abstract '  : '');
+		return ($modifiers & Stmt\Class_::MODIFIER_FINAL ? 'final '     : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_ABSTRACT   ? 'abstract '  : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_STATIC     ? 'static '    : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_PUBLIC     ? 'public '    : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_PROTECTED  ? 'protected ' : '')
+		. ($modifiers & Stmt\Class_::MODIFIER_PRIVATE    ? 'private '   : '');
 	}
 
 
@@ -101,6 +104,11 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		$res = $this->pStmts($nodes);
 		$this->keepLines = FALSE;
 		return $res;
+	}
+
+	public function pScalar_LNumber(Node\Scalar\LNumber $node)
+	{
+		return (string) $node->getAttributes()['originalValue'];
 	}
 
 	/**
@@ -204,7 +212,7 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 	}
 
 	// CONTROL BLOCKS OPENING BRACKET ON EMPTY LINE
-
+/*
 	public function pStmt_If(Stmt\If_ $node) {
 		return 'if (' . $this->p($node->cond) . ")\n{"
 		. $this->pStmts($node->stmts) . "\n" . '}'
@@ -263,5 +271,6 @@ class Printer extends PhpParser\PrettyPrinter\Standard
 		return ' catch (' . $this->p($node->type) . ' $' . $node->var . ")\n{"
 		. $this->pStmts($node->stmts) . "\n" . '}';
 	}
+*/
 
 }
