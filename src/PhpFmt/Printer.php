@@ -50,19 +50,21 @@ class Printer extends PrettyPrinter\Standard
 		}
 
 		usort($stmts, function($a, $b) {
-			if ($a instanceof Stmt\Use_ && ! $b instanceof Stmt\Use_) {
+			if ($a instanceof Stmt\Use_ && !$b instanceof Stmt\Use_) {
 				return -1;
 
-			} elseif (! $a instanceof Stmt\Use_ && $b instanceof Stmt\Use_) {
+			} elseif (!$a instanceof Stmt\Use_ && $b instanceof Stmt\Use_) {
 				return 1;
 
-			} else {
+			} elseif ($a instanceof Stmt\Use_ && $b instanceof Stmt\Use_) {
 				// both Stm\Use_
 
 				$an = implode('\\', $a->uses[0]->name->parts);
 				$bn = implode('\\', $b->uses[0]->name->parts);
 				return strcasecmp($an, $bn);
 			}
+
+			return $a->getLine() < $b->getLine() ? -1 : 1;
 		});
 
 		return $stmts;
@@ -229,34 +231,34 @@ class Printer extends PrettyPrinter\Standard
 		return $this->pImplode($nodes, ", ");
 	}
 
-	/**
-	 * "{$view[0][2]}"
-	 * "{$view[$foo][2]}"
-	 * "$view[$foo]"
-	 * "$view[0]"
-	 *
-	 * @param array $encapsList
-	 * @param $quote
-	 * @return string
-	 */
-	public function pEncapsList(array $encapsList, $quote) {
-		$return = '';
-		foreach ($encapsList as $element) {
-			if (is_string($element)) {
-				$return .= addcslashes($element, "\n\r\t\f\v$" . $quote . "\\");
-			} else {
-				if ($element instanceof Expr\Variable) {
-					$return .= $this->p($element);
-				} else if ($element instanceof Expr\ArrayDimFetch && !($element->var instanceof Expr\ArrayDimFetch)) {
-					$return .= $this->p($element);
-				} else {
-					$return .= '{' . $this->p($element) . '}';
-				}
-			}
-		}
-
-		return $return;
-	}
+//	/**
+//	 * "{$view[0][2]}"
+//	 * "{$view[$foo][2]}"
+//	 * "$view[$foo]"
+//	 * "$view[0]"
+//	 *
+//	 * @param array $encapsList
+//	 * @param $quote
+//	 * @return string
+//	 */
+//	public function pEncapsList(array $encapsList, $quote) {
+//		$return = '';
+//		foreach ($encapsList as $element) {
+//			if (is_string($element)) {
+//				$return .= addcslashes($element, "\n\r\t\f\v$" . $quote . "\\");
+//			} else {
+//				if ($element instanceof Expr\Variable) {
+//					$return .= $this->p($element);
+//				} else if ($element instanceof Expr\ArrayDimFetch && !($element->var instanceof Expr\ArrayDimFetch)) {
+//					$return .= $this->p($element);
+//				} else {
+//					$return .= '{' . $this->p($element) . '}';
+//				}
+//			}
+//		}
+//
+//		return $return;
+//	}
 
 	// CONTROL BLOCKS OPENING BRACKET ON EMPTY LINE
 /*
