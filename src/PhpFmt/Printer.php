@@ -151,6 +151,7 @@ class Printer extends PrettyPrinter\Standard
 		$result = '';
 		$lastLine = NULL;
 		$isFirstNode = TRUE;
+		$previousNode = NULL;
 		foreach ($nodes as $node) {
 			$result .= "\n";
 			if ($this->keepLines) {
@@ -159,8 +160,11 @@ class Printer extends PrettyPrinter\Standard
 				}
 			}
 
-			$prefix = '';
+			$prefix = $postfix = '';
 			if (!$isFirstNode && $node instanceof Stmt\ClassMethod) {
+				$prefix = "\n";
+			}
+			if ($previousNode instanceof Stmt\ClassConst && $node instanceof Stmt\Property) {
 				$prefix = "\n";
 			}
 
@@ -171,6 +175,7 @@ class Printer extends PrettyPrinter\Standard
 
 			$lastLine = $node->getAttributes()['endLine'];
 			$isFirstNode = FALSE;
+			$previousNode = $node;
 		}
 
 		if ($indent) {
@@ -205,6 +210,13 @@ class Printer extends PrettyPrinter\Standard
 		$out .= "]";
 		return $out;
 	}
+
+
+	public function pStmt_ClassConst(Stmt\ClassConst $node)
+	{
+		return parent::pStmt_ClassConst($node) . "\n";
+	}
+
 
 	/**
 	 * Pretty prints an array of nodes and implodes the printed values with commas.
