@@ -1,0 +1,11 @@
+<?php
+
+namespace Foo
+	\Bar
+\Quz;
+use a; use a;
+
+	use a;
+
+
+use a; class C {}
