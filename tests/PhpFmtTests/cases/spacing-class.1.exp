@@ -1,0 +1,20 @@
+<?php
+
+class C
+{
+
+	function fa()
+	{
+	}
+
+
+	function fb()
+	{
+	}
+
+
+	function fc()
+	{
+	}
+
+}

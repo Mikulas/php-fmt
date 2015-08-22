@@ -1,0 +1,20 @@
+<?php
+
+class C
+{
+
+	const CA = 1;
+
+	const CB = 1;
+
+
+	public $pa = 1;
+
+	public $pb = 1;
+
+
+	function fa()
+	{
+	}
+
+}

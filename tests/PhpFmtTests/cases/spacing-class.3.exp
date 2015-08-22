@@ -1,0 +1,40 @@
+<?php
+
+class C
+{
+
+	/**
+	 * CA
+	 * @var int
+	 */
+	const CA = 1;
+
+	/**
+	 * Cb
+	 * @var int
+	 */
+	const CB = 1;
+
+
+	/**
+	 * pa
+	 * @var int
+	 */
+	public $pa = 1;
+
+	/**
+	 * pb
+	 * @var int
+	 */
+	public $pb = 1;
+
+
+	/**
+	 * fa
+	 * @return void
+	 */
+	function fa()
+	{
+	}
+
+}
