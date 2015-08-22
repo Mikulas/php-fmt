@@ -210,6 +210,18 @@ class Printer extends PrettyPrinter\Standard
 	}
 
 
+	public function pExpr_MethodCall(Expr\MethodCall $node)
+	{
+		$prefix = '';
+		if ($node->var instanceof Expr\MethodCall) {
+			$prefix = "\n\t";
+		}
+		return $this->pVarOrNewExpr($node->var)
+			. "$prefix->" . $this->pObjectProperty($node->name)
+			. '(' . $this->pCommaSeparated($node->args) . ')';
+	}
+
+
 	public function pStmt_ClassConst(Stmt\ClassConst $node)
 	{
 		return parent::pStmt_ClassConst($node) . "\n";
